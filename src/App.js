@@ -1,23 +1,23 @@
-import * as React from "react";
-import Box from "@mui/material/Box";
 import AppBar from "@mui/material/AppBar";
-import Toolbar from "@mui/material/Toolbar";
+import Box from "@mui/material/Box";
+import Checkbox from "@mui/material/Checkbox";
+import FormControl from "@mui/material/FormControl";
+import FormControlLabel from "@mui/material/FormControlLabel";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
-import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Checkbox from "@mui/material/Checkbox";
+import Toolbar from "@mui/material/Toolbar";
+import * as React from "react";
 
+import { Buffer } from "buffer";
+import Editor from "@monaco-editor/react";
+import GithubIcon from "@mui/icons-material/GitHub";
+import Button from "@mui/material/Button";
+import IconButton from "@mui/material/IconButton";
+import Snackbar from "@mui/material/Snackbar";
 import Typography from "@mui/material/Typography"; // Import Typography component
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
-import Editor from "@monaco-editor/react";
-import { useDebounce, useAsync, useEffectOnce } from "react-use";
-import Button from "@mui/material/Button";
-import { Buffer } from "buffer";
-import Snackbar from "@mui/material/Snackbar";
-import IconButton from "@mui/material/IconButton";
-import GithubIcon from "@mui/icons-material/GitHub";
+import { useAsync, useDebounce, useEffectOnce } from "react-use";
 
 import Parser from "web-tree-sitter";
 
@@ -223,7 +223,7 @@ function SVGComp({ tree, width, height }) {
       setDebouncedY(y);
     },
     0,
-    [x, y, k]
+    [x, y, k],
   );
   React.useEffect(() => {
     const zoom = d3.zoom().on("zoom", (event) => {
@@ -380,7 +380,7 @@ export default function App() {
   const [activeLang, setActiveLang] = React.useState("javascript");
 
   const [code, setCode] = React.useState(
-    `// Sample code\nconst hello = "Hello, World!";\nconsole.log(hello);`
+    `// Sample code\nconst hello = "Hello, World!";\nconsole.log(hello);`,
   );
   const [debouncedCode, setDebouncedCode] = React.useState("");
 
@@ -395,7 +395,7 @@ export default function App() {
       setDebouncedCode(code);
     },
     500,
-    [code, activeLang]
+    [code, activeLang],
   );
 
   const computedTree = useAsync(async () => {
@@ -416,7 +416,7 @@ export default function App() {
       ? JSON.stringify(
           convertTreeNodeToJSON(computedTree.value.rootNode, terse),
           null,
-          2
+          2,
         )
       : "N/A";
   }, [computedTree, terse]);
@@ -485,7 +485,7 @@ export default function App() {
 
     // Create a decompressed stream.
     const decompressedStream = stream.pipeThrough(
-      new DecompressionStream("gzip")
+      new DecompressionStream("gzip"),
     );
 
     // Read all the bytes from this stream.
@@ -518,7 +518,7 @@ export default function App() {
       setCopyNotifcationMsg("Link copied to clipboard!");
     } catch (error) {
       setCopyNotifcationMsg(
-        `Failed to copy link to clipboard!: ${error.message}`
+        `Failed to copy link to clipboard!: ${error.message}`,
       );
       setCopyNotificationOpen(true);
     }
@@ -566,7 +566,7 @@ export default function App() {
             TreeSitter Visualizer
           </Typography>
           <IconButton
-            href="https://github.com/htfy96/ts-visualizer"
+            href="https://github.com/blopker/ts-visualizer/"
             target="_blank"
             rel="noreferrer"
             sx={{
@@ -701,10 +701,10 @@ export default function App() {
                 <SVGComp
                   tree={getTree(
                     convertTreeNodeIntoHierarchy(
-                      computedTree.value ? computedTree.value.rootNode : null
+                      computedTree.value ? computedTree.value.rootNode : null,
                     ),
                     treeViewerWidth,
-                    treeViewerHeight
+                    treeViewerHeight,
                   )}
                   width={treeViewerWidth}
                   height={treeViewerHeight}
