@@ -1,30 +1,27 @@
+import Editor from "@monaco-editor/react";
+import GithubIcon from "@mui/icons-material/GitHub";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
 import Checkbox from "@mui/material/Checkbox";
 import FormControl from "@mui/material/FormControl";
 import FormControlLabel from "@mui/material/FormControlLabel";
+import IconButton from "@mui/material/IconButton";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
-import Toolbar from "@mui/material/Toolbar";
-import * as React from "react";
-
-import { Buffer } from "buffer";
-import Editor from "@monaco-editor/react";
-import GithubIcon from "@mui/icons-material/GitHub";
-import Button from "@mui/material/Button";
-import IconButton from "@mui/material/IconButton";
 import Snackbar from "@mui/material/Snackbar";
+import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography"; // Import Typography component
+import { Buffer } from "buffer";
+import * as d3 from "d3";
+import * as React from "react";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import { useAsync, useDebounce, useEffectOnce } from "react-use";
-
-import Parser from "web-tree-sitter";
-
-import * as d3 from "d3";
+import { Language, Parser } from "web-tree-sitter";
 
 await Parser.init({
-  locateFile(scriptName, scriptDirectory) {
+  locateFile(scriptName, _) {
     return scriptName;
   },
 });
@@ -242,7 +239,8 @@ function SVGComp({ tree, width, height }) {
     return text;
   }
   return (
-    <svg width={width} height={height} ref={ref}>
+    <svg width={width} height={height} ref={ref} alt="svg">
+      <title>SVG</title>
       <g
         transform={`translate(${debouncedX},${debouncedY})scale(${debouncedK})`}
         fontWeight="300"
@@ -302,8 +300,8 @@ function convertTreeNodeToJSON(node, terse = false) {
     type: node.type,
     children: {},
   };
-
-  for (var i = 0; i < node.childCount; i++) {
+  var i;
+  for (i = 0; i < node.childCount; i++) {
     let fieldName = node.fieldNameForChild(i) || `child_${i}`;
     if (terse && node.fieldNameForChild(i)) {
       fieldName = `child_${i}_${node.fieldNameForChild(i)}`;
@@ -341,7 +339,7 @@ async function getLanguage(language) {
   if (cached_langs[language]) {
     return cached_langs[language];
   }
-  const lang = await Parser.Language.load(`tree-sitter-${language}.wasm`);
+  const lang = await Language.load(`tree-sitter-${language}.wasm`);
   cached_langs[language] = lang;
   return lang;
 }
@@ -412,13 +410,21 @@ export default function App() {
       setTreeViewerWidth(plotDiv.current.clientWidth);
       setTreeViewerHeight(plotDiv.current.clientHeight);
     }
-    return !computedTree.loading
-      ? JSON.stringify(
-          convertTreeNodeToJSON(computedTree.value.rootNode, terse),
-          null,
-          2,
-        )
-      : "N/A";
+    if (computedTree.loading) {
+      return "N/A";
+    }
+    if (!computedTree.value) {
+      return JSON.stringify(
+        { error: computedTree.error ? computedTree.error.message : "" },
+        null,
+        2,
+      );
+    }
+    return JSON.stringify(
+      convertTreeNodeToJSON(computedTree.value.rootNode, terse),
+      null,
+      2,
+    );
   }, [computedTree, terse]);
 
   React.useEffect(() => {
@@ -439,7 +445,7 @@ export default function App() {
 
       setTreeViewerHeight(plotDiv.current.clientHeight);
     }
-  }, [plotDiv]);
+  }, []);
 
   /**
    * Combine multiple Uint8Arrays into one.
